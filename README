@@ -1,0 +1,12 @@
+
+Knowls are similar to hyperlinks, except that the target of the
+knowl opens within the current web page instead of opening a
+new page.  This provides a convenient way to provide supplementary
+information, without having to leave the page and then navigate back.
+
+To have knowls on a web page, just put jquery, the knowls script,
+and the knowls CSS, in the HTML header.  Adding a knowl is similar
+to adding a hyperlink:
+
+<a knowl="target_file">words to click on</a>
+
