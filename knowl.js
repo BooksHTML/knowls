@@ -62,7 +62,7 @@ function knowl_click_handler($el) {
     var $output = $(output_id);
     var $knowl = $("#kuid-"+uid);
     $output.addClass("loading");
-    $knowl.show();
+    $knowl.hide();
     // DRG: inline code
     if ($el.attr("class") == 'internal') {
       $output.html($el.attr("value"));
@@ -82,9 +82,11 @@ function knowl_click_handler($el) {
       if (status == "error") {
         $el.removeClass("active");
         $output.html("<div class='knowl-output error'>ERROR: " + xhr.status + " " + xhr.statusText + '</div>');
+        $output.show();
       } else if (status == "timeout") {
         $el.removeClass("active");
         $output.html("<div class='knowl-output error'>ERROR: timeout. " + xhr.status + " " + xhr.statusText + '</div>');
+        $output.show();
       } else {
         $knowl.hide();
         $el.addClass("active");
