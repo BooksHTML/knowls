@@ -14,6 +14,11 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * 4/11/2012 Modified by David Guichard to allow inline knowl code.
+ * Sample use:
+ *      This is an <a knowl="" class="internal" 
+ *      value="Hello World!">inline knowl.</a>
  */
 
 /* javascript code for the knowl features 
@@ -58,6 +63,19 @@ function knowl_click_handler($el) {
     var $knowl = $("#kuid-"+uid);
     $output.addClass("loading");
     $knowl.show();
+    // DRG: inline code
+    if ($el.attr("class") == 'internal') {
+      $output.html($el.attr("value"));
+      $knowl.hide();
+      $el.addClass("active");
+      if(window.MathJax == undefined) {
+            $knowl.slideDown("slow");
+      }  else {
+            MathJax.Hub.Queue(['Typeset', MathJax.Hub, $output.get(0)]);
+            MathJax.Hub.Queue([ function() { $knowl.slideDown("slow"); }]);
+      }
+    } else {
+    // Get code from server.
     $output.load(knowl_id,
      function(response, status, xhr) { 
       $knowl.removeClass("loading");
@@ -78,7 +96,8 @@ function knowl_click_handler($el) {
             MathJax.Hub.Queue(['Typeset', MathJax.Hub, $output.get(0)]);
             MathJax.Hub.Queue([ function() { $knowl.slideDown("slow"); }]);
       }
-    });
+     }); 
+    }
   }
 } //~~ end click handler for *[knowl] elements
 
