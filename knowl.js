@@ -52,11 +52,32 @@ function knowl_click_handler($el) {
     if($el.parent().is("td") || $el.parent().is("th") ) {
       // assume we are in a td or th tag, go 2 levels up
       var cols = $el.parent().parent().children().length;
-      $el.parent().parent().after(
+      $el.parents().eq(1).after(
+      // .parents().eq(1) was formerly written as .parent().parent()
           "<tr><td colspan='"+cols+"'>"+knowl+"</td></tr>");
-    } else {
+    } else if ($el.parent().is("li")) {
       $el.parent().after(knowl);
+    // the following is implemented stupidly, but I had to do it quickly.
+    // someone please replace it with an appropriate loop -- DF
+    //also, after you close the knowl, it still has a shaded background
+    } else if ($el.parent().css('display') == "block") {
+             $el.parent().after(knowl);
+    } else if ($el.parent().parent().css('display') == "block") {
+             $el.parent().parent().after(knowl);
+    } else {
+     $el.parent().parent().parent().after(knowl);
     }
+ 
+//else {
+//      // $el.parent().after(knowl);
+//      var theparents=$el.parents();
+//      var ct=0;
+//     while (theparents[ct] != "block" && ct<2) 
+//       ct++;
+//      ct=0;
+//      //$el.parents().eq(ct).after(knowl);
+//      $el.parents().eq(ct).after(theparents[1]);
+//    }
    
     // "select" where the output is and get a hold of it 
     var $output = $(output_id);
