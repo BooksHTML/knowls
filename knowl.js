@@ -57,10 +57,14 @@ function knowl_click_handler($el) {
           "<tr><td colspan='"+cols+"'>"+knowl+"</td></tr>");
     } else if ($el.parent().is("li")) {
       $el.parent().after(knowl);
+    } 
     // the following is implemented stupidly, but I had to do it quickly.
     // someone please replace it with an appropriate loop -- DF
     //also, after you close the knowl, it still has a shaded background
-    } else if ($el.parent().css('display') == "block") {
+    else if ($el.parent().parent().is("li")) {
+      $el.parent().parent().after(knowl);
+    } 
+    else if ($el.parent().css('display') == "block") {
              $el.parent().after(knowl);
     } else if ($el.parent().parent().css('display') == "block") {
              $el.parent().parent().after(knowl);
