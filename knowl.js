@@ -60,13 +60,14 @@ function knowl_click_handler($el) {
     } 
     // the following is implemented stupidly, but I had to do it quickly.
     // someone please replace it with an appropriate loop -- DF
+    // the '.is("p")' is for the first paragraph of a theorem or proof
     //also, after you close the knowl, it still has a shaded background
     else if ($el.parent().parent().is("li")) {
       $el.parent().parent().after(knowl);
     } 
-    else if ($el.parent().css('display') == "block") {
+    else if ($el.parent().css('display') == "block" || $el.parent().is("p")) {
              $el.parent().after(knowl);
-    } else if ($el.parent().parent().css('display') == "block") {
+    } else if ($el.parent().parent().css('display') == "block" || $el.parent().parent().is("p")) {
              $el.parent().parent().after(knowl);
     } else {
      $el.parent().parent().parent().after(knowl);
