@@ -21,6 +21,12 @@
  *      value="Hello World!">inline knowl.</a>
  */
 
+/*  8/14/14  Modified by David Farmer to allow knowl content to be
+ *  taken from the element with a given id.
+ *
+ * The syntax is <a knowl="" class="id-ref" refid="proofSS">Proof</a>
+ */
+ 
 /* javascript code for the knowl features 
  * global counter, used to uniquely identify each knowl-output element
  * that's necessary because the same knowl could be referenced several times
@@ -100,7 +106,20 @@ function knowl_click_handler($el) {
             MathJax.Hub.Queue(['Typeset', MathJax.Hub, $output.get(0)]);
             MathJax.Hub.Queue([ function() { $knowl.slideDown("slow"); }]);
       }
-    } else {
+    } 
+    else if ($el.attr("class") == 'id-ref') {
+     //get content from element with the given id
+      $output.html($("#".concat($el.attr("refid"))).text());
+      $knowl.hide();
+      $el.addClass("active");
+      if(window.MathJax == undefined) {
+            $knowl.slideDown("slow");
+      }  else {
+            MathJax.Hub.Queue(['Typeset', MathJax.Hub, $output.get(0)]);
+            MathJax.Hub.Queue([ function() { $knowl.slideDown("slow"); }]);
+      }
+    }
+    else {
     // Get code from server.
     $output.load(knowl_id,
      function(response, status, xhr) { 
