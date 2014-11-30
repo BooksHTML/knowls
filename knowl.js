@@ -109,7 +109,7 @@ function knowl_click_handler($el) {
     } 
     else if ($el.attr("class") == 'id-ref') {
      //get content from element with the given id
-      $output.html($("#".concat($el.attr("refid"))).text());
+      $output.html($("#".concat($el.attr("refid"))).html());
       $knowl.hide();
       $el.addClass("active");
       if(window.MathJax == undefined) {
