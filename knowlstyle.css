@@ -105,4 +105,12 @@ div > *[knowl], p > *[knowl] {
   color: #88f;
 }
 
+.knowl-output.processing {
+  display:block!important;
+  visibility:hidden;
+  height:0pt;
+  overflow:hidden;
+}
+
 /* end knowl */
+

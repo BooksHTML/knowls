@@ -103,8 +103,9 @@ function knowl_click_handler($el) {
       if(window.MathJax == undefined) {
             $knowl.slideDown("slow");
       }  else {
-            MathJax.Hub.Queue(['Typeset', MathJax.Hub, $output.get(0)]);
-            MathJax.Hub.Queue([ function() { $knowl.slideDown("slow"); }]);
+        $knowl.addClass("processing");
+        MathJax.Hub.Queue(['Typeset', MathJax.Hub, $output.get(0)]);
+        MathJax.Hub.Queue([ function() { $knowl.removeClass("processing"); $knowl.slideDown("slow"); }]);
       }
     } 
     else if ($el.attr("class") == 'id-ref') {
@@ -115,8 +116,9 @@ function knowl_click_handler($el) {
       if(window.MathJax == undefined) {
             $knowl.slideDown("slow");
       }  else {
-            MathJax.Hub.Queue(['Typeset', MathJax.Hub, $output.get(0)]);
-            MathJax.Hub.Queue([ function() { $knowl.slideDown("slow"); }]);
+        $knowl.addClass("processing");
+        MathJax.Hub.Queue(['Typeset', MathJax.Hub, $output.get(0)]);
+        MathJax.Hub.Queue([ function() { $knowl.removeClass("processing"); $knowl.slideDown("slow"); }]);
       }
     }
     else {
@@ -140,8 +142,9 @@ function knowl_click_handler($el) {
       if(window.MathJax == undefined) {
             $knowl.slideDown("slow");
       }  else {
-            MathJax.Hub.Queue(['Typeset', MathJax.Hub, $output.get(0)]);
-            MathJax.Hub.Queue([ function() { $knowl.slideDown("slow"); }]);
+        $knowl.addClass("processing");
+        MathJax.Hub.Queue(['Typeset', MathJax.Hub, $output.get(0)]);
+        MathJax.Hub.Queue([ function() { $knowl.removeClass("processing"); $knowl.slideDown("slow"); }]);
       }
      }); 
     }
