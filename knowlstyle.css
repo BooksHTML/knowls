@@ -107,7 +107,6 @@ div > *[knowl], p > *[knowl] {
 
 .knowl-output.processing {
   display:block!important;
-  visibility:none;
   height:0pt;
   overflow:hidden;
 }
