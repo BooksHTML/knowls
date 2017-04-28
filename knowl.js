@@ -71,9 +71,9 @@ function knowl_click_handler($el) {
     else if ($el.parent().parent().is("li")) {
       $el.parent().parent().after(knowl);
     } 
-    else if ($el.parent().css('display') == "block" || $el.parent().is("p")) {
+    else if ($el.parent().css('display') == "block" || $el.parent().is("p") || $el.parent().hasClass("hidden-knowl-wrapper")) {
              $el.parent().after(knowl);
-    } else if ($el.parent().parent().css('display') == "block" || $el.parent().parent().is("p")) {
+    } else if ($el.parent().parent().css('display') == "block" || $el.parent().parent().is("p") || $el.parent().parent().hasClass("hidden-knowl-wrapper")) {
              $el.parent().parent().after(knowl);
     } else {
      $el.parent().parent().parent().after(knowl);
