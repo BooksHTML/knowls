@@ -116,15 +116,9 @@ function knowl_click_handler($el) {
       if(window.MathJax == undefined) {
             $knowl.slideDown("slow");
       }  else {
-      //     sagecell.makeSagecell({inputLocation: 'div.sagecell-sage',
-      //                     linked: true,
-       //                    languages: ['sage'],
-        //                   evalButtonText: 'Evaluate sage code'});
         $knowl.addClass("processing");
         MathJax.Hub.Queue(['Typeset', MathJax.Hub, $output.get(0)]);
         MathJax.Hub.Queue([ function() { $knowl.removeClass("processing"); $knowl.slideDown("slow"); }]);
-       // sagecell.makeSagecell({inputLocation: "div.knowl-output"});
-        // sagecell.makeSagecell({inputLocation: "#kuid-0"});
       }
     }
     else {
