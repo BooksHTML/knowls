@@ -32,6 +32,9 @@
  * that's necessary because the same knowl could be referenced several times
  * on the same page */
 var knowl_id_counter = 0;
+
+var knowl_focus_stack_uid = [];
+var knowl_focus_stack = [];
  
 function knowl_click_handler($el) {
   // the knowl attribute holds the id of the knowl
@@ -45,8 +48,27 @@ function knowl_click_handler($el) {
   var idtag = "id='"+output_id.substring(1) + "'";
   var kid   = "id='kuid-"+ uid + "'";
   // if we already have the content, toggle visibility
+
+  // Note that for tracking knowls, this setup is not optimal
+  // because it applies to open knowls and also knowls which
+  // were opened and then closed.
   if ($output_id.length > 0) {
+     thisknowlid = "kuid-"+uid
      $("#kuid-"+uid).slideToggle("fast");
+     this_knowl_focus_stack_uidindex = knowl_focus_stack_uid.indexOf(uid);
+     
+     if($el.hasClass("active")) {
+       if(this_knowl_focus_stack_uidindex != -1) {
+         knowl_focus_stack_uid.splice(this_knowl_focus_stack_uidindex, 1);
+         knowl_focus_stack.splice(this_knowl_focus_stack_uidindex, 1);
+       }
+     }
+     else {
+         knowl_focus_stack_uid.push(uid);
+         knowl_focus_stack.push($el);
+         document.getElementById(thisknowlid).focus();
+     }
+
      $el.toggleClass("active");
  
   // otherwise download it or get it from the cache
@@ -79,17 +101,6 @@ function knowl_click_handler($el) {
      $el.parent().parent().parent().after(knowl);
     }
  
-//else {
-//      // $el.parent().after(knowl);
-//      var theparents=$el.parents();
-//      var ct=0;
-//     while (theparents[ct] != "block" && ct<2) 
-//       ct++;
-//      ct=0;
-//      //$el.parents().eq(ct).after(knowl);
-//      $el.parents().eq(ct).after(theparents[1]);
-//    }
-   
     // "select" where the output is and get a hold of it 
     var $output = $(output_id);
     var $knowl = $("#kuid-"+uid);
@@ -105,7 +116,10 @@ function knowl_click_handler($el) {
       }  else {
         $knowl.addClass("processing");
         MathJax.Hub.Queue(['Typeset', MathJax.Hub, $output.get(0)]);
-        MathJax.Hub.Queue([ function() { $knowl.removeClass("processing"); $knowl.slideDown("slow"); }]);
+        MathJax.Hub.Queue([ function() { 
+               	$knowl.removeClass("processing");
+                $knowl.slideDown("slow"); 
+}]);
       }
     } 
     else if ($el.attr("class") == 'id-ref') {
@@ -118,7 +132,20 @@ function knowl_click_handler($el) {
       }  else {
         $knowl.addClass("processing");
         MathJax.Hub.Queue(['Typeset', MathJax.Hub, $output.get(0)]);
-        MathJax.Hub.Queue([ function() { $knowl.removeClass("processing"); $knowl.slideDown("slow"); }]);
+        MathJax.Hub.Queue([ function() { 
+           $knowl.removeClass("processing");
+           $knowl.slideDown("slow"); 
+           var newid="#".concat($el.attr("refid")).concat(".knowl-output");
+           $(newid).tabIndex=0;
+           $(newid).focus();
+
+           var thisknowlid = 'kuid-'.concat(uid)
+           document.getElementById(thisknowlid).tabIndex=0;
+           document.getElementById(thisknowlid).focus();
+           knowl_focus_stack_uid.push(uid);
+           knowl_focus_stack.push($el);
+           $("a[knowl]").attr("href", "");
+}]);
       }
     }
     else {
@@ -144,7 +171,16 @@ function knowl_click_handler($el) {
       }  else {
         $knowl.addClass("processing");
         MathJax.Hub.Queue(['Typeset', MathJax.Hub, $output.get(0)]);
-        MathJax.Hub.Queue([ function() { $knowl.removeClass("processing"); $knowl.slideDown("slow"); }]);
+        MathJax.Hub.Queue([ function() { 
+           $knowl.removeClass("processing");
+           $knowl.slideDown("slow"); 
+           var thisknowlid = 'kuid-'.concat(uid)
+           document.getElementById(thisknowlid).tabIndex=0;
+           document.getElementById(thisknowlid).focus();
+           knowl_focus_stack_uid.push(uid);
+           knowl_focus_stack.push($el);
+           $("a[knowl]").attr("href", "");
+       }]);
       }
      }); 
     }
@@ -156,9 +192,7 @@ function knowl_click_handler($el) {
  *  download/show/hide magic. also add a unique ID, 
  *  necessary when the same reference is used several times. */
 $(function() {
-  // $("*[knowl]").live({
     $("body").on("click", "*[knowl]", function(evt) {
-//  click: function(evt) {
       evt.preventDefault();
       var $knowl = $(this);
       if(!$knowl.attr("knowl-uid")) {
@@ -166,7 +200,33 @@ $(function() {
         knowl_id_counter++;
       }
       knowl_click_handler($knowl, evt);
-//    }
   });
 });
+
+
+$(window).load(function() {
+   $("a[knowl]").attr("href", "");
+});
+
+window.onload = function()
+{
+    document.onkeyup = function(event)
+    {
+        var e = (!event) ? window.event : event;
+        switch(e.keyCode)
+        {
+            case 27: //u        
+                if(knowl_focus_stack.length > 0 ) {
+                  most_recently_opened = knowl_focus_stack.pop();
+                  knowl_focus_stack_uid.pop();
+                  most_recently_opened.focus();
+                  }
+                else {
+                  console.log("no open knowls being tracked");
+            break;
+        }
+};
+};
+};
+
 
