@@ -55,6 +55,10 @@ function knowl_click_handler($el) {
   if ($output_id.length > 0) {
      thisknowlid = "kuid-"+uid
      $("#kuid-"+uid).slideToggle("fast");
+     if($el.attr("replace")) {
+       $($el.attr("replace")).slideToggle("fast");
+     }
+
      this_knowl_focus_stack_uidindex = knowl_focus_stack_uid.indexOf(uid);
      
      if($el.hasClass("active")) {
@@ -73,32 +77,50 @@ function knowl_click_handler($el) {
  
   // otherwise download it or get it from the cache
   } else { 
+    // where_it_goes is the location the knowl will appear *after*
+    // knowl is the variable that will hold the content of the output knowl
+    var where_it_goes = $el;
     var knowl = "<div class='knowl-output' "+kid+"><div class='knowl'><div class='knowl-content' " +idtag+ ">loading '"+knowl_id+"'</div><div class='knowl-footer'>"+knowl_id+"</div></div></div>";
+
+    // addafter="#id" means to put the knowl after the element with that id
+    if($el.attr("addafter")) {
+        where_it_goes = $($el.attr("addafter"));
+    } else if($el.attr("replace")) {
+        where_it_goes = $($el.attr("replace"));
+    }  else {
+       // otherwise, typically put it after the nearest enclosing block element
     
-    // check, if the knowl is inside a td or th in a table. otherwise assume its
-    // properly sitting inside a <div> or <p>
-    if($el.parent().is("td") || $el.parent().is("th") ) {
-      // assume we are in a td or th tag, go 2 levels up
-      var cols = $el.parent().parent().children().length;
-      $el.parents().eq(1).after(
-      // .parents().eq(1) was formerly written as .parent().parent()
-          "<tr><td colspan='"+cols+"'>"+knowl+"</td></tr>");
-    } else if ($el.parent().is("li")) {
-      $el.parent().after(knowl);
-    } 
-    // the following is implemented stupidly, but I had to do it quickly.
-    // someone please replace it with an appropriate loop -- DF
-    // the '.is("p")' is for the first paragraph of a theorem or proof
-    //also, after you close the knowl, it still has a shaded background
-    else if ($el.parent().parent().is("li")) {
-      $el.parent().parent().after(knowl);
-    } 
-    else if ($el.parent().css('display') == "block" || $el.parent().is("p") || $el.parent().hasClass("hidden-knowl-wrapper")) {
-             $el.parent().after(knowl);
-    } else if ($el.parent().parent().css('display') == "block" || $el.parent().parent().is("p") || $el.parent().parent().hasClass("hidden-knowl-wrapper")) {
-             $el.parent().parent().after(knowl);
-    } else {
-     $el.parent().parent().parent().after(knowl);
+      // check, if the knowl is inside a td or th in a table
+      if($el.parent().is("td") || $el.parent().is("th") ) {
+        // assume we are in a td or th tag, go 2 levels up
+        where_it_goes = $el.parent().parent();
+        var cols = $el.parent().parent().children().length;
+        knowl = "<tr><td colspan='"+cols+"'>"+knowl+"</td></tr>";
+      } else if ($el.parent().is("li")) {
+        where_it_goes = $el.parent();
+      } 
+      // not sure it is is worth making the following more elegant
+      else if ($el.parent().parent().is("li")) {
+        where_it_goes = $el.parent().parent();
+        // the '.is("p")' is for the first paragraph of a theorem or proof
+      } else if ($el.parent().css('display') == "block" || $el.parent().is("p") || $el.parent().hasClass("hidden-knowl-wrapper")) {
+        where_it_goes = $el.parent();
+      } else if ($el.parent().parent().css('display') == "block" || $el.parent().parent().is("p") || $el.parent().parent().hasClass("hidden-knowl-wrapper")) {
+        where_it_goes = $el.parent().parent();
+      } else {
+        //  is this a reasonable last case?
+        //  if we omit the else, then if goes after $el
+        where_it_goes = $el.parent().parent().parent();
+      }
+
+    }
+
+    // now that we know where the knowl goes, insert the knowl content
+    if($el.attr("replace")) {
+        where_it_goes.before(knowl);
+    }
+    else {
+        where_it_goes.after(knowl);
     }
  
     // "select" where the output is and get a hold of it 
@@ -106,84 +128,65 @@ function knowl_click_handler($el) {
     var $knowl = $("#kuid-"+uid);
     $output.addClass("loading");
     $knowl.hide();
+
     // DRG: inline code
     if ($el.attr("class") == 'internal') {
       $output.html($el.attr("value"));
-      $knowl.hide();
-      $el.addClass("active");
-      if(window.MathJax == undefined) {
-            $knowl.slideDown("slow");
-      }  else {
-        $knowl.addClass("processing");
-        MathJax.Hub.Queue(['Typeset', MathJax.Hub, $output.get(0)]);
-        MathJax.Hub.Queue([ function() { 
-               	$knowl.removeClass("processing");
-                $knowl.slideDown("slow"); 
-}]);
-      }
-    } 
-    else if ($el.attr("class") == 'id-ref') {
+    } else if ($el.attr("class") == 'id-ref') {
      //get content from element with the given id
       $output.html($("#".concat($el.attr("refid"))).html());
-      $knowl.hide();
-      $el.addClass("active");
-      if(window.MathJax == undefined) {
-            $knowl.slideDown("slow");
-      }  else {
-        $knowl.addClass("processing");
-        MathJax.Hub.Queue(['Typeset', MathJax.Hub, $output.get(0)]);
-        MathJax.Hub.Queue([ function() { 
-           $knowl.removeClass("processing");
-           $knowl.slideDown("slow"); 
-           var newid="#".concat($el.attr("refid")).concat(".knowl-output");
-           $(newid).tabIndex=0;
-           $(newid).focus();
-
-           var thisknowlid = 'kuid-'.concat(uid)
-           document.getElementById(thisknowlid).tabIndex=0;
-           document.getElementById(thisknowlid).focus();
-           knowl_focus_stack_uid.push(uid);
-           knowl_focus_stack.push($el);
-           $("a[knowl]").attr("href", "");
-}]);
-      }
-    }
-    else {
+    } else {
     // Get code from server.
     $output.load(knowl_id,
      function(response, status, xhr) { 
-      $knowl.removeClass("loading");
-      if (status == "error") {
-        $el.removeClass("active");
-        $output.html("<div class='knowl-output error'>ERROR: " + xhr.status + " " + xhr.statusText + '</div>');
-        $output.show();
-      } else if (status == "timeout") {
-        $el.removeClass("active");
-        $output.html("<div class='knowl-output error'>ERROR: timeout. " + xhr.status + " " + xhr.statusText + '</div>');
-        $output.show();
-      } else {
-        $knowl.hide();
-        $el.addClass("active");
-      }
-      // if we are using MathJax, then we reveal the knowl after it has finished rendering the contents
-      if(window.MathJax == undefined) {
-            $knowl.slideDown("slow");
-      }  else {
-        $knowl.addClass("processing");
-        MathJax.Hub.Queue(['Typeset', MathJax.Hub, $output.get(0)]);
-        MathJax.Hub.Queue([ function() { 
-           $knowl.removeClass("processing");
-           $knowl.slideDown("slow"); 
-           var thisknowlid = 'kuid-'.concat(uid)
-           document.getElementById(thisknowlid).tabIndex=0;
-           document.getElementById(thisknowlid).focus();
-           knowl_focus_stack_uid.push(uid);
-           knowl_focus_stack.push($el);
-           $("a[knowl]").attr("href", "");
-       }]);
-      }
-     }); 
+       $knowl.removeClass("loading");
+       if (status == "error") {
+         $el.removeClass("active");
+         $output.html("<div class='knowl-output error'>ERROR: " + xhr.status + " " + xhr.statusText + '</div>');
+         $output.show();
+       } else if (status == "timeout") {
+         $el.removeClass("active");
+         $output.html("<div class='knowl-output error'>ERROR: timeout. " + xhr.status + " " + xhr.statusText + '</div>');
+         $output.show();
+       }
+       else {
+           // this is sloppy, because this is called again later.
+              MathJax.Hub.Queue(['Typeset', MathJax.Hub, $output.get(0)]);
     }
+     });
+    };
+
+   // we have the knowl content, and put it hidden in the right place,
+   // so now we show it
+
+   $knowl.hide();
+
+   $el.addClass("active");
+ // if we are using MathJax, then we reveal the knowl after it has finished rendering the contents
+   if(window.MathJax == undefined) {
+            $knowl.slideDown("slow");
+   } else {
+     $knowl.addClass("processing");
+     MathJax.Hub.Queue(['Typeset', MathJax.Hub, $output.get(0)]);
+     MathJax.Hub.Queue([ function() {
+       $knowl.removeClass("processing");
+       $knowl.slideDown("slow");
+
+       // if replacing, then need to hide what was there
+       // (and also do some other things so that toggling works -- not implemented yet)
+       if($el.attr("replace")) {
+          var the_replaced_thing = $($el.attr("replace"));
+          the_replaced_thing.hide("slow");
+        }
+
+        var thisknowlid = 'kuid-'.concat(uid)
+        document.getElementById(thisknowlid).tabIndex=0;
+        document.getElementById(thisknowlid).focus();
+        knowl_focus_stack_uid.push(uid);
+        knowl_focus_stack.push($el);
+        $("a[knowl]").attr("href", "");
+        }]);
+      }
   }
 } //~~ end click handler for *[knowl] elements
 
@@ -208,25 +211,23 @@ $(window).load(function() {
    $("a[knowl]").attr("href", "");
 });
 
-window.onload = function()
-{
+window.onload = function() {
     document.onkeyup = function(event)
     {
         var e = (!event) ? window.event : event;
         switch(e.keyCode)
         {
-            case 27: //u        
+            case 27: //esc
                 if(knowl_focus_stack.length > 0 ) {
-                  most_recently_opened = knowl_focus_stack.pop();
-                  knowl_focus_stack_uid.pop();
-                  most_recently_opened.focus();
-                  }
-                else {
-                  console.log("no open knowls being tracked");
-            break;
-        }
-};
-};
+                   most_recently_opened = knowl_focus_stack.pop();
+                   knowl_focus_stack_uid.pop();
+                   most_recently_opened.focus();
+                } else {
+                   console.log("no open knowls being tracked");
+                   break;
+                }
+        };
+    };
 };
 
 
