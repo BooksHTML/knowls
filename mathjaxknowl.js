@@ -1,6 +1,6 @@
 /****************************************************
  *
- *  knowl.js
+ *  mathjaxknowl.js
  *  
  *  Implements \knowl{url}{math} macro for MathJax.  Knowls are
  *  described at
@@ -50,24 +50,15 @@ MathJax.Extension.Knowl = {
             the_parent = $("#MathJax-knowl-"+id).parent().parent().parent().parent();
          }
       }
+
       the_parent.after(the_content);
 
-//      $("#MathJax-knowl-"+id).closest("p, article, div").after(
-//        "<div class='knowl-output' id='"+uid+"'>" +
-//          "<div class='knowl'>" +
-//             "<div class='knowl-content' id='"+oid+"'>" +
-//               "loading '"+url+"'" +
-//             "</div>" +
-//             "<div class='knowl-footer'>" + url + "</div>" +
-//          "</div>" +
-//        "</div>"
-//      );
       $("#"+oid).load(url,function () {
         MathJax.Hub.Queue(["Typeset",MathJax.Hub,uid]);
       });
       $("#"+uid).slideDown("slow");
     }
-  },
+ },
 
   //
   //  Get a unique ID for the knowl
