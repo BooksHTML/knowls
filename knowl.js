@@ -87,7 +87,9 @@ function knowl_click_handler($el) {
         where_it_goes = $($el.attr("addafter"));
     } else if($el.attr("replace")) {
         where_it_goes = $($el.attr("replace"));
-    }  else {
+    } else if($el.hasClass("kohere")) {
+        where_it_goes = $el;
+    } else {
        // otherwise, typically put it after the nearest enclosing block element
     
       // check, if the knowl is inside a td or th in a table
@@ -103,9 +105,9 @@ function knowl_click_handler($el) {
       else if ($el.parent().parent().is("li")) {
         where_it_goes = $el.parent().parent();
         // the '.is("p")' is for the first paragraph of a theorem or proof
-      } else if ($el.parent().css('display') == "block" || $el.parent().is("p") || $el.parent().hasClass("hidden-knowl-wrapper")) {
+      } else if ($el.parent().css('display') == "block" || $el.parent().is("p") || $el.parent().hasClass("hidden-knowl-wrapper") || $el.parent().hasClass("kohere")) {
         where_it_goes = $el.parent();
-      } else if ($el.parent().parent().css('display') == "block" || $el.parent().parent().is("p") || $el.parent().parent().hasClass("hidden-knowl-wrapper")) {
+      } else if ($el.parent().parent().css('display') == "block" || $el.parent().parent().is("p") || $el.parent().parent().hasClass("hidden-knowl-wrapper") || $el.parent().parent().hasClass("kohere")) {
         where_it_goes = $el.parent().parent();
       } else {
         //  is this a reasonable last case?
@@ -130,9 +132,10 @@ function knowl_click_handler($el) {
     $knowl.hide();
 
     // DRG: inline code
-    if ($el.attr("class") == 'internal') {
+    if ($el.hasClass('internal')) {
       $output.html($el.attr("value"));
-    } else if ($el.attr("class") == 'id-ref') {
+//    } else if ($el.attr("class") == 'id-ref') {
+    } else if ($el.hasClass('id-ref')) {
      //get content from element with the given id
       $output.html($("#".concat($el.attr("refid"))).html());
     } else {
@@ -211,7 +214,9 @@ $(window).load(function() {
    $("a[knowl]").attr("href", "");
 });
 
-window.onload = function() {
+//window.onload = function() {
+/*
+window.addEventListener("load",function(event) {
     document.onkeyup = function(event)
     {
         var e = (!event) ? window.event : event;
@@ -228,6 +233,7 @@ window.onload = function() {
                 }
         };
     };
-};
+},
+false);
 
-
+*/
