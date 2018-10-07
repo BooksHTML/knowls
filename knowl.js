@@ -54,7 +54,15 @@ function knowl_click_handler($el) {
   // were opened and then closed.
   if ($output_id.length > 0) {
      thisknowlid = "kuid-"+uid
-     $("#kuid-"+uid).slideToggle("fast");
+// when this is an entry in a table, then it is the parents parent we need to toggle
+// also need to clean this up
+     if($("#kuid-"+uid).parent().is("td") || $("#kuid-"+uid).parent().is("th") ) {
+         $("#kuid-"+uid).parent().parent().slideToggle("fast");
+     }
+     else {
+         $("#kuid-"+uid).slideToggle("fast");
+     }
+
      if($el.attr("replace")) {
        $($el.attr("replace")).slideToggle("fast");
      }
