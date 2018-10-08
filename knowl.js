@@ -56,7 +56,7 @@ function knowl_click_handler($el) {
      thisknowlid = "kuid-"+uid
 // when this is an entry in a table, then it is the parents parent we need to toggle
 // also need to clean this up
-     if($("#kuid-"+uid).parent().is("td") || $("#kuid-"+uid).parent().is("th") ) {
+     if($("#kuid-"+uid).parent().is("td")) {
          $("#kuid-"+uid).parent().parent().slideToggle("fast");
      }
      else {
