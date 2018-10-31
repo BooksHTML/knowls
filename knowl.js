@@ -56,7 +56,7 @@ function knowl_click_handler($el) {
      thisknowlid = "kuid-"+uid
 // when this is an entry in a table, then it is the parents parent we need to toggle
 // also need to clean this up
-     if($("#kuid-"+uid).parent().is("td")) {
+     if($("#kuid-"+uid).parent().is("td.knowl-td")) {
          $("#kuid-"+uid).parent().parent().slideToggle("fast");
      }
      else {
@@ -105,7 +105,7 @@ function knowl_click_handler($el) {
         // assume we are in a td or th tag, go 2 levels up
         where_it_goes = $el.parent().parent();
         var cols = $el.parent().parent().children().length;
-        knowl = "<tr><td colspan='"+cols+"'>"+knowl+"</td></tr>";
+        knowl = "<tr><td colspan='"+cols+"' class='knowl-td'>"+knowl+"</td></tr>";
       } else if ($el.parent().is("li")) {
         where_it_goes = $el.parent();
       } 
