@@ -163,6 +163,9 @@ function knowl_click_handler($el) {
        else {
            // this is sloppy, because this is called again later.
               MathJax.Hub.Queue(['Typeset', MathJax.Hub, $output.get(0)]);
+// not sure of the use case for this:
+$(".hidden-sagecell-sage").attr("class", "sagecell-sage");
+sagecell.makeSagecell({inputLocation: ".sagecell-sage"});
     }
      });
     };
@@ -182,6 +185,9 @@ function knowl_click_handler($el) {
      MathJax.Hub.Queue([ function() {
        $knowl.removeClass("processing");
        $knowl.slideDown("slow");
+
+$(".hidden-sagecell-sage").attr("class", "sagecell-sage");
+sagecell.makeSagecell({inputLocation: ".sagecell-sage"});
 
        // if replacing, then need to hide what was there
        // (and also do some other things so that toggling works -- not implemented yet)
